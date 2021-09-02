@@ -4,6 +4,7 @@ const flake = new FlakeId();
 interface Room {
     id?: string;
     name: string;
+    creatorUserId?: string;
     users?: Array<string>;
 }
 export class RoomDatabase {
@@ -14,6 +15,7 @@ export class RoomDatabase {
     add(room: Room) {
         const id = flake.gen().toString();
         this.roomObj[id] = {...room, id};
+        return this.roomObj[id];
     }
 }
 const rooms = new RoomDatabase();
