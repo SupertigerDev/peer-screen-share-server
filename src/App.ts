@@ -58,6 +58,29 @@ export class App {
             next()
         })
         this.io.on("connection", socket => {
+
+            // call
+            socket.on("send_signal", ({userIdToSignal, signal}) => {
+                const user = users.getUserBySocketId(socket.id);
+                if (!user) return;
+                const requestedUserRoom = rooms.getRoomBySocketId(socket.id)
+                if (!requestedUserRoom) return;
+                const userToSignalToSocketId = rooms.getUserSocketId(userIdToSignal, requestedUserRoom.id)
+                if (!userToSignalToSocketId) return;
+                this.io.to(userToSignalToSocketId).emit("signal_received", {signal, userId: user.id})
+            })
+
+            // accept call
+            socket.on("return_signal", ({signal, userIdToSignal}) => {
+                const user = users.getUserBySocketId(socket.id);
+                if (!user) return;
+                const requestedUserRoom = rooms.getRoomBySocketId(socket.id)
+                if (!requestedUserRoom) return;
+                const userToSignalToSocketId = rooms.getUserSocketId(userIdToSignal, requestedUserRoom.id)
+                if (!userToSignalToSocketId) return;
+                this.io.to(userToSignalToSocketId).emit("return_signal_received", {signal, userId: user.id})
+            })
+
             socket.on("disconnect", reason => {
                 rooms.removeSocketId(socket.id, this.io)
                 users.removeSocketId(socket.id);

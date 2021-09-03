@@ -25,6 +25,18 @@ export class RoomDatabase {
     get(roomId: string) {
         return this.roomObj[roomId]
     }
+    getUserSocketId(userId: string, roomId: string) {
+        const user = users.get(userId);
+        if (!user) return undefined;
+        const room = this.get(roomId);
+        if (!room) return undefined;
+        return user.socketIds.find(id => room.connectedSocketIds.includes(id))
+    }
+    getRoomBySocketId(socketId: string) {
+        const roomId = this.socketIds[socketId];
+        if (!roomId) return undefined;
+        return this.get(roomId);
+    }
     addSocketId(roomId: string, socketId: string, io?: socketIO.Server) {
         this.roomObj[roomId].connectedSocketIds.push(socketId)
         this.socketIds[socketId] = roomId;
